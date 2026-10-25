@@ -106,6 +106,37 @@ test('mobile menu and layout work at narrow widths', async ({ page }, testInfo) 
   }
 });
 
+test('hero diagram stays contained and never overlaps at tablet and desktop breakpoints', async ({ page }, testInfo) => {
+  for (const width of [801, 820, 960, 961, 1024, 1050, 1051, 1280, 1440, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    const diagram = await page.locator('.squad-visual').boundingBox();
+    const boxes = await page.locator('.squad-visual .core, .squad-visual .orbit-card').evaluateAll((elements) =>
+      elements.map((element) => {
+        const { left, right, top, bottom } = element.getBoundingClientRect();
+        return { left, right, top, bottom };
+      }),
+    );
+    for (const box of boxes) {
+      expect(box.left).toBeGreaterThanOrEqual(diagram.x + 10);
+      expect(box.right).toBeLessThanOrEqual(diagram.x + diagram.width - 10);
+      expect(box.top).toBeGreaterThanOrEqual(diagram.y + 10);
+      expect(box.bottom).toBeLessThanOrEqual(diagram.y + diagram.height - 10);
+    }
+    for (let first = 0; first < boxes.length; first += 1) {
+      for (let second = first + 1; second < boxes.length; second += 1) {
+        const a = boxes[first];
+        const b = boxes[second];
+        expect(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top).toBe(true);
+      }
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    if (width === 1024 || width === 1280) {
+      await page.locator('.hero').screenshot({ path: testInfo.outputPath(`hero-${width}.png`) });
+    }
+  }
+});
+
 test('blank enquiries are rejected and can be corrected', async ({ page }) => {
   let requests = 0;
   await page.route('https://formsubmit.co/**', (route) => {
