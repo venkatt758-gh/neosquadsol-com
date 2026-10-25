@@ -9,11 +9,47 @@
 - Website hosting: GitHub Pages via GitHub Actions
 - Repository: <https://github.com/venkatt758-gh/neosquadsol-com>
 
-The email action opens the visitor's email app with a prepared message.
-Visitors must review and send it themselves. It does not submit to a server
-or claim successful delivery. Visitors without a configured email app can
-email the published address using webmail. Confirm that this mailbox can
-receive mail; website hosting does not create or manage email accounts.
+The contact form posts directly to FormSubmit, a third-party form processor,
+which forwards enquiries to the public contact mailbox. Visitors do not need
+an email app. Direct email and telephone links remain available as alternatives.
+Website hosting does not create or manage the recipient mailbox.
+
+## Activate the free contact form
+
+1. Confirm that `contact@neosquadsol.com` can receive mail.
+2. Open the deployed site's contact section, fill in a clearly labeled test
+   enquiry using non-sensitive test content, and check the consent box.
+3. Click **Send enquiry** and complete FormSubmit's CAPTCHA if shown.
+4. Check the recipient mailbox, including spam, for FormSubmit's activation
+   email. Verify its sender and activate the form using that email. Do not
+   share mailbox passwords, activation links, or provider archive tokens.
+5. After activation, submit a second test enquiry and confirm actual receipt.
+   Do not assume the first, pre-activation test was delivered.
+
+FormSubmit documents free unlimited forms and submissions, subject to its
+service availability, anti-abuse controls, and terms. There is no account or
+API key required for this integration. CAPTCHA remains enabled by default;
+do not add `_captcha=false`. An additional hidden `_honey` field helps catch
+bots. Required client-side consent and validation improve UX but are not a
+server-side security boundary.
+
+The form sends the visitor's name, email, interest, message, and consent to
+FormSubmit. The website privacy notice discloses this processing and
+FormSubmit's documented 30-day submission retention. Its CAPTCHA and service
+may use cookies. Visitors should not send sensitive information.
+
+After processing, FormSubmit redirects to
+`https://www.neosquadsol.com/thanks.html`. This is intentionally an absolute
+production URL, even for a manual local test. Until domain DNS and HTTPS
+are ready, that redirect may not reach the new site. Neither a redirect nor
+viewing the thank-you page independently proves inbox delivery.
+
+Automated browser tests intercept form submissions and verify their POST
+method, destination, fields, consent, and validation without sending data to
+the third party. Live CAPTCHA completion, activation, and receipt require
+the mailbox owner's checks above.
+
+Provider documentation: <https://formsubmit.co/documentation>
 
 ## Run and check locally
 
@@ -111,9 +147,9 @@ curl.exe -I https://neosquadsol.com/
 ```
 
 Confirm the new NeoSquad page loads, its logo and styles work, navigation
-works on mobile, HTTPS is valid, and an enquiry opens the correct recipient
-in an email app. Send a real message and verify receipt separately; opening
-an email app is not proof of mailbox delivery.
+works on mobile, HTTPS is valid, and an enquiry reaches the FormSubmit
+submission flow. After completing activation, submit a test and verify actual
+receipt in the contact mailbox separately.
 
 If the new site is unavailable, restore the saved website DNS records while
 investigating. Do not change the email records as part of rollback.

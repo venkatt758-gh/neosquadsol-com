@@ -29,7 +29,8 @@ neosquadsol-com/
 |       |-- brand.css        Shared brand color tokens
 |       `-- main.css         Responsive website styles
 |-- tests/                   Browser interaction and responsive checks
-|-- index.html               Public single-page website
+|-- index.html               Public website
+|-- thanks.html              Return page after form processing
 |-- package.json             Development and build commands
 |-- .gitignore
 `-- README.md
@@ -56,9 +57,15 @@ For browser checks, run `npx playwright install chromium` once, then `npm test`.
 ## Hosting and contact
 
 The website includes services, product exploration, AI-skilled talent, about,
-and contact sections. Enquiries are prepared locally and opened in the
-visitor's email app for review and sending to `contact@neosquadsol.com`.
-There is no backend submission or delivery confirmation.
+and contact sections. The contact form sends enquiries to FormSubmit, which
+processes them and forwards them to `contact@neosquadsol.com`. It includes
+required consent, a honeypot, and FormSubmit's default CAPTCHA.
+
+**One-time email activation is required before delivery works.** Submit the
+form, complete the CAPTCHA, and activate FormSubmit from its email in the
+recipient mailbox. Then send another test and confirm it arrives. See the
+activation and testing instructions in the hosting guide. No secret key or
+paid hosting plan is required; provider availability and terms apply.
 
 See [Hosting setup](docs/HOSTING_SETUP.md) for local commands, GitHub Pages
 deployment, GoDaddy DNS records, HTTPS, and rollback instructions for

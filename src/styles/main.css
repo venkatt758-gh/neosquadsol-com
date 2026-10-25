@@ -146,8 +146,13 @@ input, select, textarea { width: 100%; min-width: 0; border: 1px solid #d7e1e8; 
 textarea { resize: vertical; }
 input::placeholder, textarea::placeholder { color: #788591; }
 .form-disclaimer { font-size: .68rem; margin-top: -3px; }
-.enquiry-preview { background: #edf7fd; border: 1px solid #9dc9e3; border-radius: 6px; padding: 16px; margin-top: 20px; font-size: .8rem; overflow-wrap: anywhere; }
-.enquiry-preview p { margin: 10px 0 0; white-space: pre-wrap; }
+.form-honeypot { display: none; }
+.enquiry-form .consent-label { display: grid; grid-template-columns: 18px 1fr; align-items: start; gap: 10px; font-size: .72rem; font-weight: 400; color: var(--ns-text); }
+.consent-label input { width: 16px; height: 16px; margin: 4px 0 0; accent-color: #0079b5; }
+.thank-you { min-height: 65vh; display: grid; align-content: center; }
+.thank-you-header { flex-wrap: wrap; padding-block: 18px; }
+.thank-you h1 { max-width: 800px; }
+.thank-you h1 + p { margin-top: 25px; max-width: 620px; }
 .site-footer { padding: 37px 0 20px; }
 .footer-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 30px; }
 .footer-top p { margin: 0; font-size: .8rem; }

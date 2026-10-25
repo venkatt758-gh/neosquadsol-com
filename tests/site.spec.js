@@ -38,26 +38,38 @@ test('service tabs support pointer and keyboard navigation', async ({ page }) =>
   await expect(page.getByRole('tabpanel')).toContainText('Better foundations.');
 });
 
-test('enquiry safely prepares a real email without claiming delivery', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('link', { name: /Share your use case/ }).click();
-  await expect(page.getByLabel("I'm interested in")).toHaveValue('Products');
-  await page.getByLabel('Your name').fill('Draft Visitor');
-  await page.getByLabel('Work email').fill('visitor@example.com');
-  await page.getByLabel('Tell us a little more').fill('<img src=x onerror=alert(1)> A product idea.');
-  await page.getByRole('button', { name: 'Prepare email' }).click();
-  await expect(page.getByRole('status')).toContainText('has not been sent');
-  await expect(page.getByRole('status')).toContainText('<img src=x onerror=alert(1)>');
-  await expect(page.getByRole('status').locator('img')).toHaveCount(0);
-  const mailto = await page.getByRole('link', { name: 'Open email app' }).getAttribute('href');
-  expect(mailto).toContain('mailto:contact@neosquadsol.com?');
-  const parameters = new URLSearchParams(mailto.split('?')[1]);
-  expect(parameters.get('subject')).toBe('NeoSquad enquiry: Products');
-  expect(parameters.get('body')).toContain('visitor@example.com');
-  expect(parameters.get('body')).toContain('<img src=x onerror=alert(1)>');
-  await page.getByLabel('Tell us a little more').fill('Changed enquiry');
-  await expect(page.getByRole('status')).toBeHidden();
-});
+for (const width of [1280, 390]) {
+  test(`enquiry posts correct fields to the provider at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.route('https://formsubmit.co/**', (route) => route.fulfill({
+      status: 200, contentType: 'text/html', body: '<h1>Test intercepted submission</h1>',
+    }));
+    await page.goto('/');
+    await page.getByRole('link', { name: /Share your use case/ }).click();
+    await expect(page.getByLabel("I'm interested in")).toHaveValue('Products');
+    await page.getByLabel('Your name').fill('Test Visitor');
+    await page.getByLabel('Work email').fill('visitor@example.com');
+    await page.getByLabel('Tell us a little more').fill('<img src=x onerror=alert(1)> A product idea.');
+    await page.getByRole('checkbox').check();
+    const [request] = await Promise.all([
+      page.waitForRequest('https://formsubmit.co/contact@neosquadsol.com'),
+      page.getByRole('button', { name: 'Send enquiry' }).click(),
+    ]);
+    expect(request.method()).toBe('POST');
+    expect(request.isNavigationRequest()).toBe(true);
+    const fields = new URLSearchParams(request.postData());
+    expect(fields.get('name')).toBe('Test Visitor');
+    expect(fields.get('email')).toBe('visitor@example.com');
+    expect(fields.get('interest')).toBe('Products');
+    expect(fields.get('message')).toBe('<img src=x onerror=alert(1)> A product idea.');
+    expect(fields.get('consent')).toBe('Agreed to enquiry processing');
+    expect(fields.get('_subject')).toBe('NeoSquad enquiry: Products');
+    expect(fields.get('_next')).toBe('https://www.neosquadsol.com/thanks.html');
+    expect(fields.get('_honey')).toBe('');
+    expect(fields.get('_captcha')).not.toBe('false');
+    await expect(page.getByRole('heading', { name: 'Test intercepted submission' })).toBeVisible();
+  });
+}
 
 test('mobile menu and layout work at narrow widths', async ({ page }) => {
   for (const width of [320, 390, 768]) {
@@ -77,15 +89,68 @@ test('mobile menu and layout work at narrow widths', async ({ page }) => {
 });
 
 test('blank enquiries are rejected and can be corrected', async ({ page }) => {
+  let requests = 0;
+  await page.route('https://formsubmit.co/**', (route) => {
+    requests += 1;
+    return route.fulfill({ status: 200, contentType: 'text/html', body: '<h1>Test intercepted submission</h1>' });
+  });
   await page.goto('/');
   await page.getByLabel('Your name').fill('   ');
   await page.getByLabel('Work email').fill('visitor@example.com');
   await page.getByLabel('Tell us a little more').fill('   ');
-  await page.getByRole('button', { name: 'Prepare email' }).click();
-  await expect(page.getByRole('status')).toBeHidden();
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Send enquiry' }).click();
+  expect(requests).toBe(0);
   expect(await page.getByLabel('Your name').evaluate((input) => input.validity.valid)).toBe(false);
   await page.getByLabel('Your name').fill('Visitor');
   await page.getByLabel('Tell us a little more').fill('A service enquiry');
-  await page.getByRole('button', { name: 'Prepare email' }).click();
-  await expect(page.getByRole('status')).toContainText('ready to review');
+  await page.getByRole('button', { name: 'Send enquiry' }).click();
+  await expect(page.getByRole('heading', { name: 'Test intercepted submission' })).toBeVisible();
+  expect(requests).toBe(1);
+});
+
+test('consent and a valid email are required before submission', async ({ page }) => {
+  let requests = 0;
+  await page.route('https://formsubmit.co/**', (route) => {
+    requests += 1;
+    return route.abort();
+  });
+  await page.goto('/');
+  await page.getByLabel('Your name').fill('Test Visitor');
+  await page.getByLabel('Work email').fill('invalid-email');
+  await page.getByLabel('Tell us a little more').fill('A service enquiry.');
+  await page.getByRole('button', { name: 'Send enquiry' }).click();
+  expect(await page.getByLabel('Work email').evaluate((input) => input.validity.valid)).toBe(false);
+  await page.getByLabel('Work email').fill('visitor@example.com');
+  await page.getByRole('button', { name: 'Send enquiry' }).click();
+  expect(await page.getByRole('checkbox').evaluate((input) => input.validity.valid)).toBe(false);
+  expect(requests).toBe(0);
+});
+
+test('form can submit without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.route('https://formsubmit.co/**', (route) => route.fulfill({
+    status: 200, contentType: 'text/html', body: '<h1>Test intercepted submission</h1>',
+  }));
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByLabel('Your name').fill('Test Visitor');
+  await page.getByLabel('Work email').fill('visitor@example.com');
+  await page.getByLabel('Tell us a little more').fill('An enquiry without JavaScript.');
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Send enquiry' }).click();
+  await expect(page.getByRole('heading', { name: 'Test intercepted submission' })).toBeVisible();
+  await context.close();
+});
+
+test('thank-you page is built and usable on mobile without claiming inbox delivery', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto('/thanks.html');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Thank you');
+  await expect(page.getByText('This page does not independently confirm inbox delivery.', { exact: false })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Explore NeoSquad' })).toHaveAttribute('href', './');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
 });

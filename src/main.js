@@ -81,37 +81,22 @@ for (const [index, tab] of tabs.entries()) {
 for (const link of document.querySelectorAll('[data-enquiry]')) {
   link.addEventListener('click', () => {
     document.querySelector('#interest').value = link.dataset.enquiry;
-    document.querySelector('#enquiry-preview').hidden = true;
   });
 }
 
 const form = document.querySelector('#enquiry-form');
-const preview = document.querySelector('#enquiry-preview');
-form.addEventListener('input', () => { preview.hidden = true; });
-form.addEventListener('change', () => { preview.hidden = true; });
 form.addEventListener('submit', (event) => {
-  event.preventDefault();
   const data = new FormData(form);
   const fields = ['name', 'message'];
   for (const field of fields) {
     const input = form.elements.namedItem(field);
     input.setCustomValidity(data.get(field).trim() ? '' : 'Please enter more than spaces.');
   }
-  if (!form.reportValidity()) return;
-  const heading = document.createElement('strong');
-  heading.textContent = 'Your email is ready to review - it has not been sent.';
-  const summary = document.createElement('p');
-  summary.textContent = `${data.get('name').trim()} | ${data.get('email')} | ${data.get('interest')}`;
-  const message = document.createElement('p');
-  message.textContent = data.get('message').trim();
-  const email = document.createElement('a');
-  email.className = 'text-link';
-  email.textContent = 'Open email app to review and send';
-  const subject = `NeoSquad enquiry: ${data.get('interest')}`;
-  const body = `Name: ${data.get('name').trim()}\nEmail: ${data.get('email')}\nInterest: ${data.get('interest')}\n\n${data.get('message').trim()}`;
-  email.href = `mailto:contact@neosquadsol.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  preview.replaceChildren(heading, summary, message, email);
-  preview.hidden = false;
+  if (!form.reportValidity()) {
+    event.preventDefault();
+    return;
+  }
+  form.elements.namedItem('_subject').value = `NeoSquad enquiry: ${data.get('interest')}`;
 });
 for (const input of form.querySelectorAll('input, textarea')) {
   input.addEventListener('input', () => input.setCustomValidity(''));
