@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+
+.env
+.env.*
+!.env.example
+
+# Local-only records; public/ is for approved website assets only.
+private/
+
+.DS_Store
+Thumbs.db
+*.log
