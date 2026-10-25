@@ -30,7 +30,7 @@ h3 { font-size: 1.55rem; letter-spacing: -.025em; }
 .privacy-note { margin-top: 20px; font-size: .75rem; color: var(--ns-text); }
 .privacy-note summary { cursor: pointer; font-weight: 600; color: #29465a; }
 .privacy-note p { margin: 10px 0 0; }
-.site-header { background: #fffffffa; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e9eff3; }
+.site-header { background: var(--ns-white); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e9eff3; }
 .header-inner { min-height: 94px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 11px; flex-shrink: 0; }
 .brand-name { font-size: 1.45rem; line-height: 1.2; font-weight: 800; letter-spacing: -.065em; }
@@ -177,8 +177,12 @@ input::placeholder, textarea::placeholder { color: #788591; }
   .container { width: calc(100% - 40px); }
   .section { padding: 68px 0; }
   .header-inner { min-height: 78px; }
-  .menu-toggle { display: flex; align-items: center; gap: 15px; border: 1px solid #d9e4eb; background: white; border-radius: 5px; padding: 8px 13px; font-size: .8rem; }
-  .menu-toggle span { font-size: 1.2rem; }
+  .menu-toggle { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; padding: 0; border: 1px solid #d9e4eb; background: white; color: #142f43; border-radius: 8px; }
+  .menu-icon { display: flex; flex-direction: column; gap: 5px; width: 20px; }
+  .menu-icon > span { display: block; width: 20px; height: 2px; border-radius: 2px; background: currentColor; transition: transform .2s, opacity .2s; }
+  .menu-toggle[aria-expanded="true"] .menu-icon > span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-toggle[aria-expanded="true"] .menu-icon > span:nth-child(2) { opacity: 0; }
+  .menu-toggle[aria-expanded="true"] .menu-icon > span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   .main-nav { display: none; position: absolute; left: 0; right: 0; top: 100%; background: white; padding: 15px 20px 25px; border-bottom: 1px solid #d9e4eb; box-shadow: 0 15px 20px #142f430b; }
   .main-nav.is-open { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .main-nav > a { padding: 13px; font-size: .9rem; }
@@ -187,8 +191,16 @@ input::placeholder, textarea::placeholder { color: #788591; }
   h1 { font-size: clamp(2.9rem, 8vw, 4rem); }
   .hero-description { max-width: 560px; }
   .hero-note { margin-top: 28px; }
-  .squad-visual { width: min(100%, 520px); height: 440px; margin-inline: auto; }
-  .card-services { left: 30px; }.card-products { right: 18px; }.card-talent { left: 35px; bottom: 55px; }
+  .squad-visual { display: grid; gap: 12px; width: min(100%, 520px); height: auto; margin-inline: auto; padding: 24px; border-radius: 18px; }
+  .orbit { display: none; }
+  .visual-label { position: relative; inset: auto; font-size: .6rem; }
+  .core { position: relative; inset: auto; justify-self: center; width: 106px; height: 106px; margin: 5px 0 10px; border-radius: 26px; transform: none; }
+  .core-monogram { font-size: 3rem; }
+  .orbit-card { position: relative; inset: auto; width: 100%; min-width: 0; padding: 14px 16px; gap: 14px; background: white; transform: none; }
+  .orbit-card small { font-size: .55rem; letter-spacing: .07em; }
+  .orbit-card strong { font-size: .95rem; }
+  .visual-icon { flex-shrink: 0; width: 38px; height: 38px; }
+  .visual-foot { position: relative; inset: auto; gap: 4px 12px; flex-wrap: wrap; font-size: .55rem; margin-top: 4px; }
   .strip-inner { flex-wrap: wrap; gap: 14px 24px; padding-block: 20px; }
   .strip-inner > span { flex-basis: 100%; }
   .section-heading { display: block; }
@@ -215,14 +227,11 @@ input::placeholder, textarea::placeholder { color: #788591; }
   .hero h1 { font-size: clamp(2.65rem, 11vw, 3.3rem); }
   .hero-description { font-size: .9rem; }
   .button-row { gap: 19px; }.button { padding: 13px 18px; gap: 18px; font-size: .77rem; }
-  .squad-visual { height: 385px; }
-  .visual-label { top: 20px; left: 18px; font-size: .5rem; }
-  .orbit-one { width: 235px; height: 235px; left: calc(50% - 117px); top: 70px; }
-  .orbit-two { width: 300px; height: 300px; left: calc(50% - 150px); top: 40px; }
-  .core { width: 120px; height: 120px; left: calc(50% - 60px); top: 127px; border-radius: 27px; }.core-monogram { font-size: 3rem; }
-  .orbit-card { min-width: 170px; padding: 10px; }.orbit-card strong { font-size: .8rem; }.orbit-card small { font-size: .4rem; }.visual-icon { width: 30px; height: 33px; }
-  .card-services { top: 58px; left: 15px; }.card-products { top: 181px; right: 10px; }.card-talent { bottom: 40px; left: 17px; min-width: 195px; }
-  .visual-foot { font-size: .4rem; left: 15px; right: 15px; bottom: 13px; }
+  .squad-visual { padding: 20px; }
+  .visual-label { font-size: .55rem; }
+  .core { width: 96px; height: 96px; }
+  .orbit-card { padding: 12px; gap: 12px; }
+  .orbit-card small { font-size: .5rem; }
   .strip-inner { gap: 12px 20px; }.strip-inner > a { font-size: .64rem; }
   h2 { font-size: 2.15rem; }
   .service-tabs { grid-template-columns: 1fr; }.service-tabs button { padding: 14px; border-bottom-width: 2px; }

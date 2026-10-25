@@ -71,15 +71,33 @@ for (const width of [1280, 390]) {
   });
 }
 
-test('mobile menu and layout work at narrow widths', async ({ page }) => {
-  for (const width of [320, 390, 768]) {
+test('mobile menu and layout work at narrow widths', async ({ page }, testInfo) => {
+  for (const width of [320, 390, 540, 768]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/');
-    const menu = page.getByRole('button', { name: 'Menu' });
+    const menu = page.getByRole('button', { name: /menu/i });
+    await expect(menu).toHaveAccessibleName('Open menu');
+    await expect(menu.locator('.menu-icon > span')).toHaveCount(3);
+    const buttonBox = await menu.boundingBox();
+    expect(buttonBox.width).toBeGreaterThanOrEqual(44);
+    expect(buttonBox.height).toBeGreaterThanOrEqual(44);
+    const boxes = await page.locator('.squad-visual .core, .squad-visual .orbit-card').evaluateAll((elements) =>
+      elements.map((element) => {
+        const { top, bottom } = element.getBoundingClientRect();
+        return { top, bottom };
+      }),
+    );
+    for (let index = 1; index < boxes.length; index += 1) {
+      expect(boxes[index].top - boxes[index - 1].bottom).toBeGreaterThanOrEqual(10);
+    }
+    await page.locator('.squad-visual').screenshot({ path: testInfo.outputPath(`mobile-graphic-${width}.png`) });
     await menu.click();
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
+    await expect(menu).toHaveAccessibleName('Close menu');
     await page.getByRole('navigation').getByRole('link', { name: 'Services', exact: true }).click();
     await expect(menu).toHaveAttribute('aria-expanded', 'false');
+    await expect(menu).toHaveAccessibleName('Open menu');
+    expect(await page.locator('.site-header').evaluate((header) => getComputedStyle(header).backgroundColor)).toBe('rgb(255, 255, 255)');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await menu.click();
     await page.keyboard.press('Escape');
