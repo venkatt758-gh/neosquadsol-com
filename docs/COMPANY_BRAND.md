@@ -8,6 +8,11 @@
 - **Vision supplied by the founder:** Services, products, and AI-skilled human
   resources.
 
+Use **NEOSQUAD SOLUTIONS PRIVATE LIMITED** in all caps whenever the full legal
+name appears, including contact details, copyright notices, and metadata.
+Keep **NeoSquad** for the short brand name in regular copy; the logo remains
+uppercase.
+
 Suggested public-facing positioning, subject to approval:
 
 > NeoSquad brings together technology services, products, and AI-skilled

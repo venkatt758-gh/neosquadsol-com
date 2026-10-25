@@ -19,6 +19,9 @@ test('website loads without broken local resources or script errors', async ({ p
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.neosquadsol.com/');
   const address = page.getByLabel('Company address');
   await expect(address).toBeVisible();
+  await expect(address.locator('strong')).toHaveText('NEOSQUAD SOLUTIONS PRIVATE LIMITED');
+  await expect(page.locator('.footer-bottom')).toContainText('NEOSQUAD SOLUTIONS PRIVATE LIMITED.');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^NEOSQUAD SOLUTIONS PRIVATE LIMITED /);
   await expect(address).toContainText('13th Floor, Building No. 9, Survey No. 64,');
   await expect(address).toContainText('WeWork, K Raheja Mindspace, Mindspace Madhapur Road,');
   await expect(address).toContainText('HITEC City, Madhapur, Hyderabad,');

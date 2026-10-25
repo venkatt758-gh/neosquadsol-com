@@ -3,7 +3,7 @@
 ## Website details
 
 - Public website: `https://www.neosquadsol.com/`
-- Company: NeoSquad Solutions Private Limited
+- Company: NEOSQUAD SOLUTIONS PRIVATE LIMITED
 - Enquiries: `contact@neosquadsol.com`
 - Domain registrar: GoDaddy
 - Website hosting: GitHub Pages via GitHub Actions
