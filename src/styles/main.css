@@ -23,6 +23,10 @@ h3 { font-size: 1.55rem; letter-spacing: -.025em; }
 .draft-banner { text-align: center; padding: 8px 16px; background: #f1f7fa; color: #475d6d; font-size: .7rem; letter-spacing: .025em; }
 .draft-banner span { padding: 0 10px; color: #a8b8c3; }
 .contact-email { display: inline-block; font-size: 1rem; font-weight: 650; color: #0079b5; overflow-wrap: anywhere; }
+.contact-phone { display: block; width: fit-content; margin-top: 8px; font-size: 1rem; font-weight: 650; color: #0079b5; }
+.contact-email:hover, .contact-phone:hover { text-decoration: underline; text-underline-offset: 4px; }
+.company-address { margin-top: 23px; max-width: 390px; font-size: .8rem; font-style: normal; line-height: 1.85; color: var(--ns-text); }
+.company-address strong { display: block; margin-bottom: 7px; color: #29465a; font-weight: 650; }
 .privacy-note { margin-top: 20px; font-size: .75rem; color: var(--ns-text); }
 .privacy-note summary { cursor: pointer; font-weight: 600; color: #29465a; }
 .privacy-note p { margin: 10px 0 0; }

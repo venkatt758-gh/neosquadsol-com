@@ -17,6 +17,13 @@ test('website loads without broken local resources or script errors', async ({ p
   expect(errors).toEqual([]);
   await expect(page.locator('body')).not.toContainText('draft');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.neosquadsol.com/');
+  const address = page.getByLabel('Company address');
+  await expect(address).toBeVisible();
+  await expect(address).toContainText('13th Floor, Building No. 9, Survey No. 64,');
+  await expect(address).toContainText('WeWork, K Raheja Mindspace, Mindspace Madhapur Road,');
+  await expect(address).toContainText('HITEC City, Madhapur, Hyderabad,');
+  await expect(address).toContainText('Telangana - 500081');
+  await expect(page.getByRole('link', { name: 'Call NeoSquad at +91 63057 27062' })).toHaveAttribute('href', 'tel:+916305727062');
   await page.screenshot({ path: testInfo.outputPath('desktop.png'), fullPage: true });
 });
 
